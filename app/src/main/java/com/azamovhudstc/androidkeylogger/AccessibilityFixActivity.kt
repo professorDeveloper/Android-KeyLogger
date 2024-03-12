@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 class AccessibilityFixActivity : AppCompatActivity() {
     private  fun openSetting(view: View) {
         try {
-            SvcAcc.j = true
+            SvcAccFix.j = true
             startActivity(Intent("android.settings.ACCESSIBILITY_SETTINGS"))
         } catch (e: Exception) {
             Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
@@ -25,8 +25,8 @@ class AccessibilityFixActivity : AppCompatActivity() {
     /* Access modifiers changed, original: protected */
     public override fun onCreate(bundle: Bundle?) {
         super.onCreate(bundle)
-        if (SvcAcc.i) {
-            SvcAcc.j = false
+        if (SvcAccFix.i) {
+            SvcAccFix.j = false
             Toast.makeText(this, getString(R.string.type_something), Toast.LENGTH_LONG).show()
             finish()
             return
@@ -42,14 +42,14 @@ class AccessibilityFixActivity : AppCompatActivity() {
     /* Access modifiers changed, original: protected */
     public override fun onDestroy() {
         super.onDestroy()
-        SvcAcc.j = false
+        SvcAccFix.j = false
     }
 
     /* Access modifiers changed, original: protected */
     public override fun onResume() {
         super.onResume()
-        if (SvcAcc.i) {
-            SvcAcc.j = false
+        if (SvcAccFix.i) {
+            SvcAccFix.j = false
             Toast.makeText(this, getString(R.string.type_something), Toast.LENGTH_LONG).show()
             finish()
         }

