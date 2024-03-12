@@ -82,22 +82,6 @@ class MainFixActivity : AppCompatActivity() {
         dialogInterface.dismiss()
     }
 
-    private fun writeWithBase64(view: View) {
-        val str = "android.intent.action.VIEW"
-        val urlString = String(
-            Base64.decode("aHR0cHM6Ly93d3cuYS1zcHkuY29tLz8=", 0),
-            StandardCharsets.UTF_8
-        ) + "TypingLogger"
-        val intent = Intent(str, Uri.parse(urlString)).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-
-        try {
-            startActivity(intent)
-        } catch (unused: Exception) {
-            startActivity(Intent.createChooser(intent, "Browse with"))
-        }
-    }
 
     private fun dialogPositiveClick(dialogInterface: DialogInterface, i: Int) {
         if (selectedItem.isNotEmpty()) {
@@ -192,16 +176,6 @@ class MainFixActivity : AppCompatActivity() {
         }
 
         if (Calendar.getInstance().timeInMillis - lastUpdateTime > 600000) {
-            findViewById<View>(R.id.belolayout).setOnClickListener { view ->
-                writeWithBase64(
-                    view
-                )
-            }
-            (findViewById<View>(R.id.adv1) as TextView).text =
-                String(Base64.decode("VGhpcyBhcHAgaXMgcHJvdmlkZWQgYnk6", 0), StandardCharsets.UTF_8)
-            (findViewById<View>(R.id.adv2) as TextView).text =
-                String(Base64.decode("d3d3LmEtc3B5LmNvbQ==", 0), StandardCharsets.UTF_8)
-            findViewById<View>(R.id.belolayout).visibility = View.VISIBLE
         }
     }
 
