@@ -1,0 +1,26 @@
+<resources>
+    <string name="accept">Allow</string>
+    <string name="act_acc">Accessibility Service «Typing Logger» must be activated manually. Press «Next» and follow the instructions below.</string>
+    <string name="act_acc_step1">This page looks slightly different in different versions of Android. Look for «Services».</string>
+    <string name="act_acc_step2">Press «Typing Logger».</string>
+    <string name="act_acc_step3">Activate «Typing Logger» and press the «Allow» button.</string>
+    <string name="androidx_startup">androidx.startup</string>
+    <string name="app_name">Typing Logger</string>
+    <string name="ask_delete">Do you want to delete all records of the selected day?</string>
+    <string name="cancel">Cancel</string>
+    <string name="content_copied">Content to be copied</string>
+    <string name="content_shared">Content to be shared</string>
+    <string name="copy">Copy</string>
+    <string name="delete">Delete</string>
+    <string name="disclosure">This application uses Accessibility Service</string>
+    <string name="next">Next</string>
+    <string name="not_deleted">File could not be deleted!</string>
+    <string name="ok">OK</string>
+    <string name="purpose">The purpose of this application is to record text changes in order to recover them later if they were accidentally deleted. The recorded text is being stored on the device in a secure and private folder which is accessible only by the application. The data will not be transferred or shared with other applications or out of the device without the explicit intention of the user.</string>
+    <string name="search_menu_title">Search</string>
+    <string name="share">Share</string>
+    <string name="status_bar_notification_info_overflow">999+</string>
+    <string name="type_something">Accessibility Service successfully activated! Type something and return to this app to see the result.</string>
+    <string name="using_accessibility">Using Accessibility Service allows the application to record text changes in text input fields.</string>
+
+</resources>
