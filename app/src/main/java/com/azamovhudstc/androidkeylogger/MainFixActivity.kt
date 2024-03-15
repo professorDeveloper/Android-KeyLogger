@@ -7,11 +7,13 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Base64
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.coroutines.runBlocking
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
@@ -174,6 +176,9 @@ class MainFixActivity : AppCompatActivity() {
         } catch (unused: Exception) {
             Calendar.getInstance().timeInMillis - 300001
         }
+
+
+
 
         if (Calendar.getInstance().timeInMillis - lastUpdateTime > 600000) {
         }

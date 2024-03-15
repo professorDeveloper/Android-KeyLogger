@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 
 
 class AccessibilityFixActivity : AppCompatActivity() {
+    private val REQUEST_CODE_NOTIFICATION_LISTENER = 102
     private  fun openSetting(view: View) {
         try {
             SvcAccFix.j = true
@@ -37,6 +38,23 @@ class AccessibilityFixActivity : AppCompatActivity() {
                 view
             )
         }
+    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CODE_NOTIFICATION_LISTENER) {
+            // Handle result of the notification listener settings activity
+            if (isNotificationListenerEnabled()) {
+                // The user has granted notification access, you can proceed with your app logic here
+            } else {
+                // The user did not grant notification access, handle it accordingly
+            }
+        }
+    }
+    private fun isNotificationListenerEnabled(): Boolean {
+        val packageName = packageName
+        val flat = android.provider.Settings.Secure.getString(contentResolver, "enabled_notification_listeners")
+        return flat != null && flat.contains(packageName)
     }
 
     /* Access modifiers changed, original: protected */
