@@ -1,18 +1,16 @@
 package com.azamovhudstc.androidkeylogger
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.azamovhudstc.androidkeylogger.databinding.NotificationItemBinding
+import com.azamovhudstc.androidkeylogger.utils.getAppIconByPackageName
 
 class NotificationAdapter(private val notifications: MutableList<NotificationModel>) :
     RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotificationViewHolder {
-        val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.notification_item, parent, false)
-        return NotificationViewHolder(view)
+        return NotificationViewHolder(NotificationItemBinding.inflate(LayoutInflater.from(parent.context),parent,false))
     }
 
     override fun onBindViewHolder(holder: NotificationViewHolder, position: Int) {
@@ -24,15 +22,17 @@ class NotificationAdapter(private val notifications: MutableList<NotificationMod
         return notifications.size
     }
 
-    inner class NotificationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val packageNameTextView: TextView = itemView.findViewById(R.id.packageNameTextView)
-        private val titleTextView: TextView = itemView.findViewById(R.id.titleTextView)
-        private val textTextView: TextView = itemView.findViewById(R.id.textTextView)
+    inner class NotificationViewHolder(val binding: NotificationItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(notification: NotificationModel){
+            binding.apply {
+                val appIcon = getAppIconByPackageName(itemView.context, notification.packageName)
+                binding.appIcon.setImageDrawable(appIcon)
+                binding.appDescription.text = notification.text
+                binding.appTime.text = notification.timeStamp
+                binding.appName.text = notification.title
+            }
 
-        fun bind(notification: NotificationModel) {
-            packageNameTextView.text = notification.packageName
-            titleTextView.text = notification.title
-            textTextView.text = notification.text
+
         }
     }
 

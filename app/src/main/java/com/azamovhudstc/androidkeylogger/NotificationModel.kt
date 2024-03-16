@@ -1,3 +1,5 @@
 package com.azamovhudstc.androidkeylogger
 
-data class NotificationModel(val packageName: String, val title: String, val text: String)
+import android.graphics.drawable.Drawable
+
+data class NotificationModel(val packageName: String, val title: String, val text: String,val timeStamp:String,)

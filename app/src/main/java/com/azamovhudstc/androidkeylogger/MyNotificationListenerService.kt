@@ -7,10 +7,11 @@ import android.service.notification.StatusBarNotification
 import android.util.Log
 import java.io.File
 import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MyNotificationListenerService : NotificationListenerService() {
-    private val notifications = mutableListOf<NotificationModel>()
-    private lateinit var adapter: NotificationAdapter
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         super.onNotificationPosted(sbn)
@@ -21,15 +22,17 @@ class MyNotificationListenerService : NotificationListenerService() {
         val title = extras.getString("android.title")
         val text = extras.getCharSequence("android.text")?.toString()
         val packageName = sbn.packageName
+        val timeStamp = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
 
         if (title != null && text != null) {
             Log.d("NotificationListener", "Package: $packageName, Title: $title, Text: $text")
             // Handle the received SMS or message here
                 // MainActivity da updateRecyclerView ni chaqirish
-                val intent = Intent("com.yourpackage.NOTIFICATION_LISTENER")
+                val intent = Intent("com.azamovhudstc.androidkeylogger.NOTIFICATION_LISTENER")
                 intent.putExtra("packageName", packageName)
                 intent.putExtra("title", title)
                 intent.putExtra("text", text)
+                intent.putExtra("date", timeStamp)
                 sendBroadcast(intent)
 //            saveNotificationToFile(NotificationModel(packageName, title, text))
         }

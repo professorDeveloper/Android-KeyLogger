@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="a">
+        <item>Step 1</item>
+        <item>Step 2</item>
+        <item>Step 3</item>
+        <item>Step 4</item>
+    </array>
+    <array name="kinship_ru">
+        <item>Не родственник</item>
+        <item>Отец</item>
+        <item>Мать</item>
+        <item>Муж</item>
+        <item>Жена</item>
+        <item>Сын</item>
+        <item>Дочь</item>
+        <item>Старший брат</item>
+        <item>Младший брат</item>
+        <item>Старшая сестра</item>
+        <item>Младшая сестра</item>
+
+    </array>
+</resources>
