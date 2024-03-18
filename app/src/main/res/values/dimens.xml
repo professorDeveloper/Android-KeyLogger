@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="abc_text_size_subtitle_material_toolbar">16dp</dimen>
+    <dimen name="abc_text_size_title_material">20sp</dimen>
+    <dimen name="abc_text_size_title_material_toolbar">20dp</dimen>
+    <dimen name="activity_horizontal_spacing">@dimen/activity_spacing</dimen>
+    <dimen name="activity_horizontal_spacing_double">@dimen/activity_spacing_double</dimen>
+    <dimen name="activity_horizontal_spacing_double_double">@dimen/activity_spacing_double_double</dimen>
+    <dimen name="activity_horizontal_spacing_halve">@dimen/activity_spacing_halve</dimen>
+    <dimen name="activity_horizontal_spacing_halve_halve">@dimen/activity_spacing_halve_halve</dimen>
+    <dimen name="activity_spacing">16dp</dimen>
+    <dimen name="activity_spacing_double">32dp</dimen>
+    <dimen name="activity_spacing_double_double">64dp</dimen>
+    <dimen name="activity_spacing_halve">8dp</dimen>
+    <dimen name="activity_spacing_halve_halve">4dp</dimen>
+    <dimen name="activity_vertical_spacing">@dimen/activity_spacing</dimen>
+    <dimen name="activity_vertical_spacing_double">@dimen/activity_spacing_double</dimen>
+    <dimen name="activity_vertical_spacing_double_double">@dimen/activity_spacing_double_double</dimen>
+    <dimen name="activity_vertical_spacing_halve">@dimen/activity_spacing_halve</dimen>
+    <dimen name="activity_vertical_spacing_halve_halve">@dimen/activity_spacing_halve_halve</dimen>
+    <dimen name="advertisement_box_content_height">54dp</dimen>
+    <dimen name="appcompat_dialog_background_inset">16dp</dimen>
+    <dimen name="browser_actions_context_menu_max_width">500dp</dimen>
+    <dimen name="browser_actions_context_menu_min_padding">20dp</dimen>
+    <dimen name="cardview_compat_inset_shadow">1dp</dimen>
+    <dimen name="cardview_default_elevation">2dp</dimen>
+    <dimen name="cardview_default_radius">2dp</dimen>
+    <dimen name="clock_face_margin_start">64dp</dimen>
+    <dimen name="compat_button_inset_horizontal_material">4dp</dimen>
+    <dimen name="compat_button_inset_vertical_material">6dp</dimen>
+    <dimen name="compat_button_padding_horizontal_material">8dp</dimen>
+    <dimen name="compat_button_padding_vertical_material">4dp</dimen>
+    <dimen name="compat_control_corner_material">2dp</dimen>
+    <dimen name="compat_notification_large_icon_max_height">320dp</dimen>
+    <dimen name="compat_notification_large_icon_max_width">320dp</dimen>
+</resources>

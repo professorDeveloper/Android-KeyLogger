@@ -13,6 +13,10 @@
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorWhite">#ffffff</color>
     <color name="ripple_color">#297AFF</color>
+    <color name="colorPrimary">#b1495a</color>
+    <color name="colorPrimaryVariant">#5d4157</color>
+    <color name="colorSecondary">#d18a96</color>
+    <color name="colorSecondaryVariant">#727f99</color>
 
     <!-- theme 1 -->
     <color name="seed_1">#00658e</color>

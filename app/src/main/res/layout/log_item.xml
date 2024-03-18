@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/item_text_typing_card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:layout_marginBottom="@dimen/activity_vertical_spacing"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="24"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="@dimen/activity_horizontal_spacing_double"
+                android:layout_marginTop="@dimen/activity_vertical_spacing"
+                android:layout_marginRight="@dimen/activity_horizontal_spacing_double"
+                android:baselineAligned="false"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|center_vertical|center_horizontal|center|start"
+                    android:layout_weight="16"
+                    android:gravity="left|center_vertical|center_horizontal|center|start"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/item_text_typing_application_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:ellipsize="end"
+                        android:gravity="left|center_vertical|center_horizontal|center|start"
+                        android:maxLines="1"
+                        android:minLines="1"
+                        android:text="@string/application_name"
+                        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                        android:textStyle="bold" />
+
+                    <Space
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/activity_vertical_spacing_halve_halve" />
+
+                    <TextView
+                        android:id="@+id/item_text_typing_date_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/roboto"
+                        android:gravity="left|center_vertical|center_horizontal|center|start"
+                        android:maxLines="1"
+                        android:minLines="1"
+                        android:text="@string/date_time"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                        android:textColor="?attr/colorPrimary" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right|center_vertical|center_horizontal|center|end"
+                    android:layout_weight="4"
+                    android:gravity="right|center_vertical|center_horizontal|center|end"
+                    android:orientation="horizontal">
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/item_text_typing_application_icon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:contentDescription="@string/application_icon"
+                        android:maxWidth="40dp"
+                        android:maxHeight="40dp"
+                        android:minWidth="40dp"
+                        android:minHeight="40dp"
+                        android:src="@drawable/ic_warning"
+                        />
+                </LinearLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2.6dp"
+                android:layout_marginLeft="@dimen/activity_horizontal_spacing_double"
+                android:layout_marginTop="@dimen/activity_vertical_spacing"
+                android:layout_marginRight="@dimen/activity_horizontal_spacing_double"
+                android:layout_marginBottom="@dimen/activity_vertical_spacing"
+                android:background="@drawable/shape_dash_line"
+                android:layerType="software" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_horizontal_spacing_double"
+                android:layout_marginRight="@dimen/activity_horizontal_spacing_double"
+                android:layout_marginBottom="@dimen/activity_vertical_spacing"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|center_vertical|center_horizontal|center|start"
+                    android:layout_weight="16"
+                    android:gravity="left|center_vertical|center_horizontal|center|start"
+                    android:orientation="horizontal">
+
+
+                    <TextView
+                        android:id="@+id/item_text_typing_text_typing"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left|center_vertical|center_horizontal|center|start"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/rubik_medium"
+                        android:gravity="left|center_vertical|center_horizontal|center|start"
+                        android:maxLines="3"
+                        android:minLines="1"
+                        android:textColor="?attr/colorPrimary"
+                        android:text="@string/app_accessibility_service"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/item_text_typing_info_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right|center_vertical|center_horizontal|center|end"
+                    android:layout_marginStart="@dimen/activity_horizontal_spacing"
+                    android:background="@drawable/box_background_light_ellipses_24"
+                    android:gravity="right|center_vertical|center_horizontal|center|end"
+                    android:orientation="horizontal"
+                    android:paddingLeft="@dimen/activity_horizontal_spacing"
+                    android:paddingTop="@dimen/activity_vertical_spacing_halve"
+                    android:paddingRight="@dimen/activity_horizontal_spacing"
+                    android:paddingBottom="@dimen/activity_vertical_spacing_halve"
+                    android:visibility="visible">
+
+                    <ImageView
+                        android:id="@+id/item_text_typing_battery_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@string/battery_icon"
+                        android:maxWidth="24dp"
+                        android:maxHeight="24dp"
+                        android:minWidth="24dp"
+                        android:minHeight="24dp"
+                        android:src="@drawable/ic_warning"
+                        app:tint="?attr/colorAccent" />
+
+
+                    <Space
+                        android:layout_width="@dimen/activity_horizontal_spacing_halve_halve"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/item_text_typing_battery_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/gilory_bold"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:minLines="1"
+                        android:text="@string/agree" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
