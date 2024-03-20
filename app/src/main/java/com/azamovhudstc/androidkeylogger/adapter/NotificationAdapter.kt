@@ -1,4 +1,4 @@
-package com.azamovhudstc.androidkeylogger
+package com.azamovhudstc.androidkeylogger.adapter
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager

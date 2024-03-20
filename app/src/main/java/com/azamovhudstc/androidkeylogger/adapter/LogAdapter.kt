@@ -1,13 +1,14 @@
-package com.azamovhudstc.androidkeylogger
+package com.azamovhudstc.androidkeylogger.adapter
 
 import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.azamovhudstc.androidkeylogger.R
+import com.azamovhudstc.androidkeylogger.activity.MainFixActivity
 import com.azamovhudstc.androidkeylogger.databinding.LogItemBinding
 import com.azamovhudstc.androidkeylogger.model.LogModel
 import com.azamovhudstc.androidkeylogger.utils.getAppIconByPackageName
