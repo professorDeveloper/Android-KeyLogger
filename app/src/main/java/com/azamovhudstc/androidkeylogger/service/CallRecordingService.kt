@@ -41,10 +41,12 @@ class CallRecordingService : Service() {
             when (state) {
                 TelephonyManager.CALL_STATE_OFFHOOK -> {
                     Log.d("EVENT", "onCallStateChanged: ")
+                    startRecording()
                     ScreenRecordService.startRecording(applicationContext)
                 }
                 TelephonyManager.CALL_STATE_IDLE -> {
                     Log.d("EVENT", "onCallStateChanged: STOPPED")
+                    stopRecording()
                     ScreenRecordService.stopRecording(applicationContext)
                 }
             }

