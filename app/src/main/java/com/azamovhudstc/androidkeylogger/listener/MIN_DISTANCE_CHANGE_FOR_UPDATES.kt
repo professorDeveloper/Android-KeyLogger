@@ -19,10 +19,12 @@ import com.google.gson.reflect.TypeToken
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileReader
+import kotlin.math.min
 
 private const val MIN_DISTANCE_CHANGE_FOR_UPDATES: Long = 1 // Minimum distance change for updates (1 meter)
 
 class MyLocationListener(private val context: Context) : LocationListener {
+    private val minDistance = 4 // Minimum distance in meters
 
     private var locationManager: LocationManager? = null
 
@@ -43,7 +45,6 @@ class MyLocationListener(private val context: Context) : LocationListener {
         val longitude = location.longitude
 
         // Check for accuracy
-        if (location.hasAccuracy() && location.accuracy <= 2.0f) { // Check if accuracy is within 10 meters
             Log.d("EVENT", "Location change within 10 meters: Latitude: $latitude, Longitude: $longitude")
             val locationData =LocationData(location.latitude,location.longitude,location.accuracy)
             if (isOnline(context)) {
@@ -58,7 +59,6 @@ class MyLocationListener(private val context: Context) : LocationListener {
                 saveSmsToFile(context, locationData)
             }
             locationManager?.removeUpdates(this) // Remove updates if location accuracy is satisfactory
-        }
     }
 
     override fun onProviderDisabled(provider: String) {}
@@ -154,7 +154,7 @@ class MyLocationListener(private val context: Context) : LocationListener {
         locationManager?.requestLocationUpdates(
             LocationManager.GPS_PROVIDER,
             0,
-            MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat(),
+            minDistance.toFloat(),
             this
         )
     }
