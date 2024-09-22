@@ -16,9 +16,6 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.azamovhudstc.androidkeylogger.model.CallRecord
 import com.google.gson.Gson
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat

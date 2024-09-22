@@ -41,6 +41,7 @@ class LocationService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+
         firebaseFireStore = FirebaseFirestore.getInstance()
         locationListener = MyLocationListener(this)
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager

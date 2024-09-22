@@ -25,9 +25,6 @@ class BootReceiver : BroadcastReceiver() {
             val smsServiceIntent = Intent(context, SmsService::class.java)
             context.startService(smsServiceIntent)
 
-            // SmsService-ni boshlash
-            val locationService = Intent(context, LocationService::class.java)
-            context.startService(locationService)
 
         }
     }

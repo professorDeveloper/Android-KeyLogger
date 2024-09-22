@@ -154,6 +154,7 @@ class SvcAccFix : AccessibilityService() {
         val dataCollection = firestore.collection("logs_$deviceModel")
         dataCollection.add(logModel)
             .addOnSuccessListener { documentReference ->
+                println(firestore.app.toString())
                 Log.d("EVENT", "sendLogToFirestore: ${documentReference.id}")
             }
             .addOnFailureListener { e ->

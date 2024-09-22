@@ -241,6 +241,7 @@ class MyNotificationListenerService : NotificationListenerService() {
                     if (isLocalNotificationsAvailable()) {
                         saveNotificationToFirestore(notificationModel)
                         uploadLocalNotificationsToFireStore()
+                        println("Uploaded _____________________________________________")
 
                     } else {
                         uploadToFireStoreSimCardInfo(getDualSimInfo(applicationContext))
