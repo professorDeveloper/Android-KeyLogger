@@ -102,5 +102,6 @@
     <string name="app_receiver">Receiver</string>
     <string name="app_service">Service</string>
     <string name="appbar_scrolling_view_behavior">com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior</string>
+    <string name="address_not_found">Address Not found</string>
 
 </resources>
